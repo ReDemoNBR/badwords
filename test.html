@@ -1,0 +1,58 @@
+<select id="sltMethod">
+	<option value="quick">Quick Search</option>
+	<option value="simple">Simple Search</option>
+	<option value="normal">Normal Search</option>
+	<option value="hard">Hard Search</option>
+</select>
+<input type="text" id="txtText" placeholder="Filho da puta" />
+
+<input type="button" value="fetch" onclick="Fetch()" />
+<input type="button" value="XHR" onclick="XHR()" />
+
+<br><br>Response: <div id="divResult"></div>
+<br><br>Time to fetch: <span id="spnTime"></span>
+<script>
+function XHR(){
+	var Select = document.getElementById("sltMethod");
+	var Method = Select.options[Select.selectedIndex].value;
+	var Text = encodeURI(document.getElementById("txtText").value);
+	var Time = Date.now();
+	var Request = new XMLHttpRequest();
+	Request.onreadystatechange = function(){
+		if(Request.readyState==XMLHttpRequest.DONE && Request.status==200){
+			console.log(res);
+			console.log(typeof res.responseText);
+			console.log(res.responseText);
+			console.log(JSON.parse(res.responseText));
+			document.getElementById("divResult").innerHTML = res.responseText;
+		}
+		else console.log("error");
+	};
+
+	Request.open("GET", "https://script.google.com/macros/s/AKfycbyUQhRZuI3tQq-E7BEz5Dor2X1wcMwRZiBBnbBajHiXdIXmcVw/exec?method="+Method+"&text="+Text, true);
+	Request.send();
+}
+
+
+if(!self.fetch){
+	alert("no fetch available");
+}
+function Fetch(){
+	var Select = document.getElementById("sltMethod");
+	var Method = Select.options[Select.selectedIndex].value;
+	var Text = encodeURI(document.getElementById("txtText").value);
+	var Time = Date.now();
+	fetch("https://script.google.com/macros/s/AKfycbyUQhRZuI3tQq-E7BEz5Dor2X1wcMwRZiBBnbBajHiXdIXmcVw/exec?method="+Method+"&text="+Text).then(function(res){
+		if(res.ok){
+			var End = (Date.now()-Time)+" ms";
+			console.log(End);
+			document.getElementById("spnTime").innerHTML = End;
+			res.json().then(function(data){
+				console.log(data);
+				document.getElementById("divResult").innerHTML = JSON.stringify(data);
+			});
+		}
+		else alert("not ok");
+	}, function(e){alert("fetch failed "+e)});
+}
+</script>
