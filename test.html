@@ -17,21 +17,29 @@ function XHR(){
 	var Method = Select.options[Select.selectedIndex].value;
 	var Text = encodeURI(document.getElementById("txtText").value);
 	var Time = Date.now();
-	var Request = new XMLHttpRequest();
-	Request.onreadystatechange = function(){
-		if(Request.readyState==XMLHttpRequest.DONE && Request.status==200){
-			console.log(res);
-			console.log(typeof res.responseText);
-			console.log(res.responseText);
-			console.log(JSON.parse(res.responseText));
-			document.getElementById("divResult").innerHTML = res.responseText;
-		}
-		else console.log("error");
-	};
-
-	Request.open("GET", "https://script.google.com/macros/s/AKfycbyUQhRZuI3tQq-E7BEz5Dor2X1wcMwRZiBBnbBajHiXdIXmcVw/exec?method="+Method+"&text="+Text, true);
-	Request.send();
+	var request = createCORSRequest("GET", "https://script.google.com/macros/s/AKfycbyUQhRZuI3tQq-E7BEz5Dor2X1wcMwRZiBBnbBajHiXdIXmcVw/exec?method="+Method+"&text="+Text);
+	if (request){
+    	request.onload = function(){
+        	console.log(request.responseText);
+    	};
+    }
+    request.send();
 }
+
+function createCORSRequest(method, url){
+    var xhr = new XMLHttpRequest();
+    if ("withCredentials" in xhr){
+        xhr.open(method, url, true);
+    } else if (typeof XDomainRequest != "undefined"){
+        xhr = new XDomainRequest();
+        xhr.open(method, url);
+    } else {
+        xhr = null;
+    }
+    return xhr;
+}
+
+
 
 
 if(!self.fetch){
